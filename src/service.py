@@ -111,6 +111,13 @@ class VoiceBridgeService:
             if vad_task:
                 vad_task.cancel()
 
+    async def _busy_timeout_guard(self, timeout: float = 30.0):
+        """超时看门狗：防止 AstrBot 异常或无语音回复导致 is_busy 永久死锁"""
+        await asyncio.sleep(timeout)
+        if self.is_busy:
+            logger.warning(f"等待 PixNyaa 语音回复超过 {timeout}s，自动重置繁忙状态")
+            self.is_busy = False
+
     def _check_wakeword(self, text: str) -> Optional[str]:
         """检查文本是否包含唤醒词，并根据配置返回裁剪后的内容"""
         wakewords = self.trigger_cfg.get("wakewords", ["猫猫"])
@@ -134,34 +141,36 @@ class VoiceBridgeService:
         return clean_text
 
     async def _vad_loop(self):
-        """连续检测循环（支持唤醒词过滤与全量连续模式）"""
+        """连续检测循环（基于常驻无损单流与生成器，彻底避免反复进程启停导致吞音）"""
         env = self.audio._get_env()
         mode = self.trigger_cfg.get("mode", "wakeword")
-        logger.info(f"音频监听循环已启动，当前工作模式: {mode}")
+        logger.info(f"音频流式监听守护已启动，当前工作模式: {mode}")
 
-        while self._running:
-            if self.is_busy:
-                await asyncio.sleep(0.5)
-                continue
+        await self.vad.start_stream(env)
 
-            try:
-                audio_path = await self.vad.record_until_silence(env)
-                if not audio_path:
-                    continue
+        try:
+            async for audio_path in self.vad.listen_segments(lambda: self.is_busy):
+                if not self._running:
+                    break
 
                 # 转写语音
+                logger.info("检测到有效人声并完成截断，提交 SenseVoice 识别...")
                 text = await self.stt.transcribe(audio_path)
                 if not text:
+                    logger.debug("SenseVoice 转写为空，继续监听")
                     continue
+
+                logger.info(f"🎤 语音转写结果: 【{text}】")
 
                 if mode == "wakeword":
                     processed = self._check_wakeword(text)
                     if processed is None:
-                        logger.debug(f"忽略未唤醒的语音输入: 【{text}】")
+                        logger.info(f"未匹配到唤醒词 (当前唤醒词: {self.trigger_cfg.get('wakewords')})，忽略: 【{text}】")
                         continue
 
                     logger.info(f"🌟 命中唤醒词！原始转写: 【{text}】")
                     self.is_busy = True
+                    asyncio.create_task(self._busy_timeout_guard(30.0))
 
                     # 如果用户只是喊了句“猫猫”，没有带后续问题，默认打个招呼
                     msg_to_send = processed if processed else "你好呀"
@@ -171,10 +180,15 @@ class VoiceBridgeService:
                 else:
                     # continuous 全量模式
                     self.is_busy = True
+                    asyncio.create_task(self._busy_timeout_guard(30.0))
                     logger.info(f"VAD 捕获识别: 【{text}】")
                     await self.astrbot.send_user_message(text)
 
-            except Exception as e:
-                logger.error(f"VAD 循环异常: {e}")
-                self.is_busy = False
-                await asyncio.sleep(1.0)
+        except Exception as e:
+            logger.error(f"VAD 循环异常: {e}", exc_info=True)
+            self.is_busy = False
+            # 异常发生后，继续重启 _vad_loop
+            await asyncio.sleep(1.0)
+            asyncio.create_task(self._vad_loop())
+        finally:
+            await self.vad.stop_stream()
