@@ -209,9 +209,9 @@ class AstrBotClient:
             "font": 0,
             "sender": {
                 "user_id": self.user_id,
-                "nickname": "蓝牙音箱拾音用户",
+                "nickname": "NyaaCaster",
                 "card": "",
-                "role": "member",
+                "role": "owner" if not self.is_group else "member",
             },
         }
 

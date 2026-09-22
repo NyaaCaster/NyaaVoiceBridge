@@ -34,9 +34,27 @@ astrbot:
   # 若在 macmini 宿主机访问 AstrBot 容器，请使用 AstrBot 容器暴露的端口
   ws_url: "ws://127.0.0.1:6199/ws"
   
-  # 虚拟用户标识 (对应 PixNyaa 专属独立会话)
-  user_id: 10001
+  # 虚拟用户标识 (对应猫猫智能框架知识库 NyaaLibrary-MCP 的唯一身份)
+  user_id: 1369356335
   nickname: "主人"
   
-  # 机器人 QQ 号 (自报标识)
+  # 机器人 QQ 号 (自报标识，匹配 PixNyaa)
   self_id: 943653038
+
+# 触发与唤醒配置
+trigger:
+  # 模式选择:
+  # wakeword: 唤醒词模式（常驻后台监听，但只有听到唤醒词才触发向 PixNyaa 提问）
+  # continuous: 全量连续检测（只要听到有效人声就直接发给 PixNyaa，无唤醒词）
+  # manual: 手动触发模式（不自动监听，外部调用 trigger 接口触发单次交互）
+  mode: "wakeword"
+
+  # 唤醒词列表（命中任意一个词即触发）
+  wakewords:
+    - "猫猫"
+    - "喵喵"
+
+  # 是否在发送给 PixNyaa 时自动剔除唤醒词（例如用户说“猫猫今天天气怎么样”，去除后发送“今天天气怎么样”）
+  # 如果用户仅唤醒说“猫猫”，程序会自动转为日常打招呼“你好呀”
+  strip_wakeword: true
+

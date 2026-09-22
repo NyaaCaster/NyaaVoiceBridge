@@ -21,11 +21,17 @@ DEFAULT_CONFIG: Dict[str, Any] = {
         "ws_url": "ws://127.0.0.1:6199/ws",
         "token": "",
         "bot_id": 943653038,
-        "user_id": 10001,
+        "user_id": 1369356335,
         "group_id": 0,
         "is_group": False,
         "send_voice_flag": True,
         "reconnect_interval": 5,
+    },
+    "trigger": {
+        "mode": "wakeword",  # "wakeword" (唤醒词触发) | "continuous" (连续全量VAD) | "manual" (外部触发)
+        "wakewords": ["猫猫", "喵喵", "pixnyaa"],
+        "strip_wakeword": True,  # 发送给 AstrBot 时是否裁剪掉开头的唤醒词
+        "wake_sound_path": "",   # 唤醒成功时的提示音(可选)
     },
     "vad": {
         "enabled": False,
