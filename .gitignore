@@ -25,7 +25,9 @@ venv/
 
 # Environment and secrets
 .env
+.env.*
 config/config.yaml
+!config/config.example.yaml
 
 # Audio / Temp files
 *.wav
