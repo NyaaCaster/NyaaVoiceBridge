@@ -1,0 +1,20 @@
+[Unit]
+Description=Bluetooth Audio Self-healing Watchdog for NDZ-03-GA
+After=sound.target pipewire.service
+Wants=sound.target pipewire.service
+
+[Service]
+Type=simple
+User=root
+Environment=XDG_RUNTIME_DIR=/run/user/0
+Environment=DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/0/bus
+ExecStart=/usr/local/bin/bt-audio-monitor.sh
+Restart=always
+RestartSec=5s
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=bt-audio-monitor
+
+[Install]
+WantedBy=multi-user.target
