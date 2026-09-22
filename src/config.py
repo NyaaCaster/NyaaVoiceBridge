@@ -5,14 +5,14 @@ import yaml
 
 DEFAULT_CONFIG: Dict[str, Any] = {
     "device": {
-        "input_node": "bluez_input.A0_E9_DB_10_B9_D9.0",
-        "output_node": "bluez_output.A0_E9_DB_10_B9_D9.1",
+        "input_node": "bluez_input.00_00_00_00_00_00.0",
+        "output_node": "bluez_output.00_00_00_00_00_00.1",
         "setup_script": "/usr/local/bin/bt-audio-setup.sh",
-        "sample_rate": 16000,
+        "sample_rate": 48000,
         "channels": 1,
     },
     "stt": {
-        "api_url": "http://192.168.31.142:5052/v1/audio/transcriptions",
+        "api_url": "http://127.0.0.1:5052/v1/audio/transcriptions",
         "model": "SenseVoiceSmall",
         "language": "zh",
         "timeout": 15,
@@ -20,8 +20,8 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     "astrbot": {
         "ws_url": "ws://127.0.0.1:6199/ws",
         "token": "",
-        "bot_id": 943653038,
-        "user_id": 1369356335,
+        "bot_id": 10000,
+        "user_id": 10001,
         "group_id": 0,
         "is_group": False,
         "send_voice_flag": True,
