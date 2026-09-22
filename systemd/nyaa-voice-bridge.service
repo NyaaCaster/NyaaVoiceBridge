@@ -1,0 +1,25 @@
+[Unit]
+Description=NyaaVoiceBridge - Bridge Bluetooth Audio to AstrBot PixNyaa
+After=network.target sound.target pipewire.service
+Wants=sound.target pipewire.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/NyaaVoiceBridge
+Environment=PYTHONUNBUFFERED=1
+Environment=XDG_RUNTIME_DIR=/run/user/0
+Environment=DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/0/bus
+ExecStartPre=/usr/local/bin/bt-audio-setup.sh
+ExecStart=/opt/NyaaVoiceBridge/venv/bin/python -m src.main --config /opt/NyaaVoiceBridge/config/config.yaml
+Restart=always
+RestartSec=3s
+LimitNOFILE=65536
+
+# 日志输出到 systemd journal
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=nyaa-voice-bridge
+
+[Install]
+WantedBy=multi-user.target
