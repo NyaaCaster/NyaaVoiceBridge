@@ -106,7 +106,7 @@ class AstrBotClient:
         except Exception:
             return
 
-        # 检查是否为 AstrBot 呼叫的发送消息动作
+        # 检查是否为 AstrBot 呼叫的 API 动作
         action = data.get("action")
         params = data.get("params", {})
         echo = data.get("echo")
@@ -124,6 +124,15 @@ class AstrBotClient:
                     "echo": echo,
                 }
                 await self._ws.send(json.dumps(resp))
+        elif echo and self._ws:
+            # 兼容处理其他 OneBot V11 API（如 get_msg, get_status 等），防止 AstrBot 报超时错误
+            resp = {
+                "status": "ok",
+                "retcode": 0,
+                "data": {},
+                "echo": echo,
+            }
+            await self._ws.send(json.dumps(resp))
 
     async def _process_reply(self, params: dict):
         """从 AstrBot 的回复消息段中提取文本与 TTS 语音"""
@@ -204,9 +213,11 @@ class AstrBotClient:
 
         # 构造消息段
         message_segments = [{"type": "text", "data": {"text": text}}]
-        # 附带语音标记
+        # 如果启用了语音标记，使用合法的空白/占位 base64，避免 AstrBot 预处理报 No such file 警告
         if self.send_voice_flag:
-            message_segments.append({"type": "record", "data": {"file": "voice_input.wav"}})
+            # 1 秒静音微型 WAV 的 base64 占位符
+            dummy_pcm_base64 = "base64://UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA="
+            message_segments.append({"type": "record", "data": {"file": dummy_pcm_base64}})
 
         event_payload = {
             "time": int(time.time()),
