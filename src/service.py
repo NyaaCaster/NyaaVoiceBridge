@@ -119,13 +119,27 @@ class VoiceBridgeService:
             self.is_busy = False
 
     def _check_wakeword(self, text: str) -> Optional[str]:
-        """检查文本是否包含唤醒词，并根据配置返回裁剪后的内容"""
-        wakewords = self.trigger_cfg.get("wakewords", ["猫猫"])
+        """检查文本是否包含唤醒词或近似音，并根据配置返回裁剪后的内容"""
+        # 默认唤醒词调整为“小猫同学”，同时支持“小猫”、“猫猫”、“喵喵”等
+        wakewords = self.trigger_cfg.get("wakewords", [
+            "小猫同学", "小猫同学生", "小猫", "猫猫同学", "猫猫", "喵喵同学", "喵喵"
+        ])
+        # 常见 SenseVoice 近似音/同音错别字字典放宽
+        fuzzy_patterns = [
+            "小毛同学", "小茅同学", "小帽同学", "熊猫同学",
+            "小猫同居", "小猫统一", "小毛同", "小猫痛",
+            "小毛", "小茅", "小帽",
+            "毛毛", "矛矛", "喵喵"
+        ]
+        all_candidates = list(wakewords) + [w for w in fuzzy_patterns if w not in wakewords]
+        # 按长度降序排序，优先匹配最长词（例如优先匹配“小猫同学”而不是“小猫”）
+        all_candidates.sort(key=len, reverse=True)
+
         strip = self.trigger_cfg.get("strip_wakeword", True)
         clean_text = text.strip()
 
         matched_word = None
-        for w in wakewords:
+        for w in all_candidates:
             if w in clean_text:
                 matched_word = w
                 break
@@ -137,7 +151,7 @@ class VoiceBridgeService:
             # 找到唤醒词位置并截取后面的真实问询
             idx = clean_text.find(matched_word)
             sub = clean_text[idx + len(matched_word):].lstrip("，, 。.？！?!~ ")
-            return sub if sub else ""  # 空字符串代表纯唤醒（例如只喊了句“猫猫”）
+            return sub if sub else ""  # 空字符串代表纯唤醒（例如只喊了句“小猫同学”）
         return clean_text
 
     async def _vad_loop(self):

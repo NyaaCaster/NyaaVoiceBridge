@@ -24,22 +24,22 @@ audio:
   bt_setup_script: "/usr/local/bin/bt-audio-setup.sh"
 
 stt:
-  # SenseVoice OpenAI 兼容转录端点
-  api_base: "http://192.168.31.142:5052/v1"
+  # SenseVoice OpenAI 兼容转录端点 (按实际局域网/本地部署地址填写)
+  api_base: "http://127.0.0.1:5052/v1"
   model: "SenseVoiceSmall"
   timeout: 30
 
 astrbot:
   # OneBot V11 反向 WebSocket 服务端地址 (AstrBot 监听端口)
-  # 若在 macmini 宿主机访问 AstrBot 容器，请使用 AstrBot 容器暴露的端口
+  # 若在宿主机访问容器内 AstrBot，填入对应网络可达地址
   ws_url: "ws://127.0.0.1:6199/ws"
   
-  # 虚拟用户标识 (对应猫猫智能框架知识库 NyaaLibrary-MCP 的唯一身份)
-  user_id: 1369356335
-  nickname: "主人"
+  # 虚拟用户标识 (与 AstrBot 插件/知识库/主人画像中的 user_id 保持一致)
+  user_id: 10001
+  nickname: "Master"
   
-  # 机器人 QQ 号 (自报标识，匹配 PixNyaa)
-  self_id: 943653038
+  # 机器人自报标识 (对应 AstrBot 中配置的 bot QQ 号)
+  self_id: 10000
 
 # 触发与唤醒配置
 trigger:
@@ -51,6 +51,8 @@ trigger:
 
   # 唤醒词列表（命中任意一个词即触发）
   wakewords:
+    - "小猫同学"
+    - "小猫"
     - "猫猫"
     - "喵喵"
 
