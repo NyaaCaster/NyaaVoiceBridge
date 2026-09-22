@@ -10,7 +10,7 @@ class STTClient:
 
     def __init__(self, config: dict):
         self.stt_cfg = config.get("stt", {})
-        self.api_url = self.stt_cfg.get("api_url", "http://192.168.31.142:5052/v1/audio/transcriptions")
+        self.api_url = self.stt_cfg.get("api_url", "http://127.0.0.1:5052/v1/audio/transcriptions")
         self.model = self.stt_cfg.get("model", "SenseVoiceSmall")
         self.language = self.stt_cfg.get("language", "zh")
         self.timeout = aiohttp.ClientTimeout(total=self.stt_cfg.get("timeout", 15))
