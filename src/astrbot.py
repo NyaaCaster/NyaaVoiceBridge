@@ -18,7 +18,7 @@ class AstrBotClient:
         self.runtime_cfg = config.get("runtime", {})
         self.ws_url = self.bot_cfg.get("ws_url", "ws://127.0.0.1:6199/ws")
         self.token = self.bot_cfg.get("token", "")
-        self.bot_id = self.bot_cfg.get("bot_id", 943653038)
+        self.bot_id = self.bot_cfg.get("bot_id", 10000)
         self.user_id = self.bot_cfg.get("user_id", 10001)
         self.group_id = self.bot_cfg.get("group_id", 0)
         self.is_group = self.bot_cfg.get("is_group", False)
@@ -33,14 +33,26 @@ class AstrBotClient:
     async def connect_loop(self):
         """保持与 AstrBot 的 WebSocket 长连接与心跳"""
         self._running = True
-        headers = {}
+        headers = {
+            "X-Client-Role": "Universal",
+            "X-Self-ID": str(self.bot_id),
+            "User-Agent": "CQHttp/4.15.0",
+        }
         if self.token:
             headers["Authorization"] = f"Bearer {self.token}"
 
         while self._running:
             try:
                 logger.info(f"正在连接 AstrBot: {self.ws_url}")
-                async with websockets.connect(self.ws_url, extra_headers=headers) as ws:
+                # 兼容 websockets 14+ (additional_headers) 与旧版 (extra_headers)
+                # 显式将 max_size 扩大到 32MB（避免 Base64 TTS 音频超过默认 1MB 导致断连）
+                ws_kwargs = {"max_size": 32 * 1024 * 1024}
+                try:
+                    conn = websockets.connect(self.ws_url, additional_headers=headers, **ws_kwargs)
+                except TypeError:
+                    conn = websockets.connect(self.ws_url, extra_headers=headers, **ws_kwargs)
+
+                async with conn as ws:
                     self._ws = ws
                     logger.info("已成功连接到 AstrBot PixNyaa (OneBot V11)")
 
