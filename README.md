@@ -1,7 +1,7 @@
 # NyaaVoiceBridge 🐱🎙️
 
 > 「世界の中心で、AIをさけぶ」<br>——连接物理蓝牙音频设备与 AstrBot 机器人的独立低延迟语音桥接服务。
->- ……这不是小爱同学，是贾维斯……吧
+>- ……这不是小爱同学，是贾维斯……喵维斯？
 >- 当然，除非你有猫猫全套智能框架~
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -87,9 +87,15 @@ python3 -m venv venv
 ### 3. 配置
 ```bash
 cp config/config.example.yaml config/config.yaml
-# 根据实际环境调整 SenseVoice 地址与 AstrBot WebSocket 地址
+# 根据实际环境调整配置
 vim config/config.yaml
 ```
+
+> 💡 **唤醒词与触发配置说明**：
+> 打开 `config/config.yaml` 找到 `trigger:` 小节：
+> - `mode`: 运行模式，可选 `wakeword`（带唤醒词）或 `continuous`（免唤醒连续拾音对话）。
+> - `wakewords`: 唤醒词列表，默认已配置为 `小猫同学`（并兼容 `小猫`、`猫猫`、`喵喵` 及各类常见谐音）。
+> - `strip_wakeword`: 是否在发送给 AstrBot 前自动剔除唤醒词（默认 `true`）。
 
 ### 4. 注册并启动 Systemd 服务
 ```bash
@@ -110,6 +116,12 @@ journalctl -u nyaa-voice-bridge.service -f
 # 实时跟踪蓝牙自愈看门狗日志
 journalctl -u bt-audio-monitor.service -f
 ```
+
+---
+
+## 📚 深度架构与技术文档
+想要深入了解整个语音系统底层 PipeWire 交互原理、防吞字 VAD 环形缓冲、OneBot 协议逆向以及 AstrBot 下挂**猫猫全套智能框架（人格、提示词、记忆提炼与外部工具）**的完整运作机制？
+👉 请查阅：**[技术架构与拓扑文档](.docs/技术架构与拓扑文档.md)**
 
 ---
 
