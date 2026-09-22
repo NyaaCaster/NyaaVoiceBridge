@@ -51,26 +51,13 @@ DEFAULT_CONFIG: Dict[str, Any] = {
 }
 
 def load_config(config_path: str) -> Dict[str, Any]:
-    """加载 YAML 配置文件，并与默认配置深度合并（支持从同目录 .env 或系统环境变量覆盖敏感字段）"""
-    # 尝试加载可能存在的 .env 文件
-    env_path = os.path.join(os.path.dirname(config_path), "..", ".env")
-    if os.path.exists(env_path):
-        try:
-            with open(env_path, "r", encoding="utf-8") as ef:
-                for line in ef:
-                    line = line.strip()
-                    if line and not line.startswith("#") and "=" in line:
-                        k, v = line.split("=", 1)
-                        os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
-        except Exception:
-            pass
-
+    """加载 YAML 配置文件，并与默认配置深度合并"""
     if not os.path.exists(config_path):
         print(f"[警告] 配置文件 {config_path} 不存在，使用内置默认配置")
-        user_config = {}
-    else:
-        with open(config_path, "r", encoding="utf-8") as f:
-            user_config = yaml.safe_load(f) or {}
+        return DEFAULT_CONFIG.copy()
+
+    with open(config_path, "r", encoding="utf-8") as f:
+        user_config = yaml.safe_load(f) or {}
 
     merged = DEFAULT_CONFIG.copy()
     for section, values in user_config.items():
@@ -78,17 +65,5 @@ def load_config(config_path: str) -> Dict[str, Any]:
             merged[section].update(values)
         else:
             merged[section] = values
-
-    # 环境变量覆盖（优先级别最高，方便容器或无配置文件场景安全注入）
-    if "NYAA_BT_INPUT_NODE" in os.environ:
-        merged["device"]["input_node"] = os.environ["NYAA_BT_INPUT_NODE"]
-    if "NYAA_BT_OUTPUT_NODE" in os.environ:
-        merged["device"]["output_node"] = os.environ["NYAA_BT_OUTPUT_NODE"]
-    if "NYAA_STT_API_URL" in os.environ:
-        merged["stt"]["api_url"] = os.environ["NYAA_STT_API_URL"]
-    if "NYAA_ASTRBOT_WS_URL" in os.environ:
-        merged["astrbot"]["ws_url"] = os.environ["NYAA_ASTRBOT_WS_URL"]
-    if "NYAA_ASTRBOT_USER_ID" in os.environ:
-        merged["astrbot"]["user_id"] = int(os.environ["NYAA_ASTRBOT_USER_ID"])
 
     return merged
