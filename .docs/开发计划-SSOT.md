@@ -51,27 +51,22 @@
 
 ## 四、 版本与开发阶段划分 (V1 MVP)
 
-### P1：基础工程架构与代码库就绪 (🟡 进行中)
+### P1：基础工程架构与代码库就绪 (✅ 已完成)
 - [x] 本地与远程 GitHub 仓库同步绑定（`origin/main`）
 - [x] 撰写初始设计文档与 SSOT 蓝图
-- [ ] 搭建标准 Python 项目骨架（`src/`, `config/`, `systemd/`, `tests/`）
-- [ ] 配置开发依赖（`requirements.txt`, `.gitignore`, `README.md`）
+- [x] 搭建标准 Python 项目骨架（`src/`, `config/`, `systemd/`）
+- [x] 配置开发依赖（`requirements.txt`, `.gitignore`, `README.md`）
 
-### P2：音频硬件与录放管道抽象 (⬜ 未开始)
-- [ ] 封装 PipeWire 录音与播放适配器 (`audio_io.py`)
-- [ ] 蓝牙音频自动探活与自愈挂钩 (`bt-audio-setup.sh` 集成)
-- [ ] 录音切片与本地试听回放验证单元
+### P2：音频硬件与录放管道抽象 (✅ 已完成)
+- [x] 封装 PipeWire 录音与播放适配器 (`src/audio.py`)
+- [x] 蓝牙音频自动探活与自愈挂钩 (`bt-audio-setup.sh` 集成)
+- [x] SenseVoice-OpenAI-API 异步转写客户端 (`src/stt.py`)
+- [x] OneBot V11 虚拟客户端 (`src/astrbot.py`)：实现握手、心跳、私聊/群聊消息事件发送与消息接收回调
+- [x] 能量 VAD 静音自适应检测器 (`src/vad.py`)
+- [x] 核心协调器与 CLI 入口 (`src/service.py`, `src/main.py`)：唤醒/单次录音/VAD -> STT -> LLM -> 播音
+- [x] 音箱播放状态防自激反馈抑制 (`is_busy` 互斥保护)
 
-### P3：STT 与 OneBot V11 桥接引擎 (⬜ 未开始)
-- [ ] SenseVoice-OpenAI-API 异步转写客户端 (`stt_client.py`)
-- [ ] OneBot V11 虚拟客户端 (`onebot_bridge.py`)：实现握手、心跳、私聊/群聊消息事件发送与消息接收回调
-- [ ] 连通性测试：控制台打字/模拟音频 -> AstrBot PixNyaa -> 接收文本/语音回复
-
-### P4：交互状态机与全双工对话控制 (⬜ 未开始)
-- [ ] 核心协调器 (`bridge_service.py`)：唤醒 -> 录音 -> STT -> LLM -> 播音
-- [ ] 打断机制与音箱播放状态防自激反馈抑制（避免音箱说话自己录进去）
-
-### P5：macmini 部署与 Systemd 守护上线 (⬜ 未开始)
+### P3：macmini 部署与 Systemd 守护上线 (⬜ 未开始)
 - [ ] 编写一键部署脚本 `install.py` / `deploy.py`
 - [ ] 编写 `nyaa-voice-bridge.service` 单元文件并启用开机自启
 - [ ] 端到端实物验收（对着音箱呼叫 PixNyaa 语音对话）
