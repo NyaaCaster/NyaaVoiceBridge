@@ -10,12 +10,12 @@ audio:
   xdg_runtime_dir: "/run/user/0"
   dbus_session_bus_address: "unix:path=/run/user/0/bus"
   
-  # 音频节点名称 (可通过 wpctl / pw-record --target 查看)
-  input_target: "bluez_input.A0_E9_DB_10_B9_D9.0"
-  output_target: "bluez_output.A0_E9_DB_10_B9_D9.1"
+  # 音频节点名称 (可通过 wpctl status / pw-cli 查看蓝牙设备的节点名)
+  input_target: "bluez_input.00_00_00_00_00_00.0"
+  output_target: "bluez_output.00_00_00_00_00_00.1"
   
-  # 录音参数
-  sample_rate: 16000
+  # 录音参数 (建议 48000Hz 匹配蓝牙 HFP 原生标准采样)
+  sample_rate: 48000
   channels: 1
   silence_timeout: 1.5      # 静音切片截断时间 (秒)
   max_record_duration: 30   # 单次录音最大时长 (秒)
