@@ -5,10 +5,12 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
-    <!-- 蓝牙 SCO 耳机通道与状态权限 -->
+    <!-- 蓝牙 SCO 耳机通道与状态权限 (Android 12+ 适配 neverForLocation) -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_CONNECT"
+        android:usesPermissionFlags="neverForLocation" />
 
     <!-- 网络通信权限 (允许明文 HTTP/WS) -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -45,7 +47,7 @@
             android:name=".service.VoiceBridgeService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="microphone" />
+            android:foregroundServiceType="microphone|connectedDevice" />
 
         <!-- 系统下拉快捷设置磁贴开关 (Quick Settings Tile) -->
         <service

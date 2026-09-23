@@ -112,6 +112,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun toggleServiceState() {
+        if (!checkPermissionsGranted()) {
+            Toast.makeText(this, "请先授予录音和附近设备(蓝牙)权限", Toast.LENGTH_LONG).show()
+            checkAndRequestPermissions()
+            return
+        }
+
         val intent = Intent(this, VoiceBridgeService::class.java)
         if (VoiceBridgeService.isServiceRunning) {
             intent.action = VoiceBridgeService.ACTION_STOP
@@ -120,13 +126,28 @@ class MainActivity : AppCompatActivity() {
             // 启动前先自动保存最新配置
             saveConfigFromUi()
             intent.action = VoiceBridgeService.ACTION_START
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(intent)
-            } else {
-                startService(intent)
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    startForegroundService(intent)
+                } else {
+                    startService(intent)
+                }
+            } catch (e: Exception) {
+                TuiLogBus.error("Activity", "启动前台服务异常: ${e.message}")
+                Toast.makeText(this, "启动服务失败: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
         tvTerminalOutput.postDelayed({ updateServiceUiState() }, 300)
+    }
+
+    private fun checkPermissionsGranted(): Boolean {
+        val micOk = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+        val btOk = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
+        } else {
+            true
+        }
+        return micOk && btOk
     }
 
     private fun updateServiceUiState() {

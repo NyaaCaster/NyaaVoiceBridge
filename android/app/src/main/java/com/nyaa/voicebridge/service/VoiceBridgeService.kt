@@ -46,6 +46,9 @@ class VoiceBridgeService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // 任何情况下收到 startForegroundService 必须在 5 秒内无条件呼叫 startForeground 绑定通知
+        ensureForegroundNotification()
+
         when (intent?.action) {
             ACTION_START -> startVoiceBridge()
             ACTION_STOP -> stopVoiceBridge()
@@ -53,21 +56,33 @@ class VoiceBridgeService : Service() {
         return START_STICKY
     }
 
+    private fun ensureForegroundNotification() {
+        val notification = buildForegroundNotification("小猫同学随时随地耳语守护中...")
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val type = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE or ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
+                } else {
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+                }
+                startForeground(NOTIFICATION_ID, notification, type)
+            } else {
+                startForeground(NOTIFICATION_ID, notification)
+            }
+        } catch (e: Exception) {
+            try {
+                startForeground(NOTIFICATION_ID, notification)
+            } catch (e2: Exception) {
+                // ignore
+            }
+        }
+    }
+
     private fun startVoiceBridge() {
         if (isServiceRunning) return
         isServiceRunning = true
-
-        val notification = buildForegroundNotification("小猫同学随时随地耳语守护中...")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val type = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE or ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
-            } else {
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
-            }
-            startForeground(NOTIFICATION_ID, notification, type)
-        } else {
-            startForeground(NOTIFICATION_ID, notification)
-        }
+        ensureForegroundNotification()
+        TuiLogBus.info("Service", "🚀 NyaaVoiceBridge 随身服务已启动")
 
         // 获取部分唤醒锁 (PARTIAL_WAKE_LOCK)，保证锁屏放口袋时 CPU 保持工作
         try {
@@ -109,15 +124,19 @@ class VoiceBridgeService : Service() {
         scoManager = BluetoothScoManager(this)
         scoManager?.startSco()
 
-        val vadEngine = com.nyaa.voicebridge.audio.RmsVadEngine()
-        audioRecordDriver = AudioRecordDriver(
-            sampleRate = 48000,
-            channels = 1,
-            vadEngine = vadEngine,
-            onSpeechSegmentReady = { wavBytes ->
-                onSpeechCaptured(wavBytes)
-            }
-        ).also { it.startRecording() }
+        try {
+            val vadEngine = com.nyaa.voicebridge.audio.RmsVadEngine()
+            audioRecordDriver = AudioRecordDriver(
+                sampleRate = 48000,
+                channels = 1,
+                vadEngine = vadEngine,
+                onSpeechSegmentReady = { wavBytes ->
+                    onSpeechCaptured(wavBytes)
+                }
+            ).also { it.startRecording() }
+        } catch (e: Exception) {
+            TuiLogBus.error("Service", "启动 AudioRecord 驱动失败: ${e.message}")
+        }
 
         // 同步通知系统下拉快捷开关磁贴刷新状态
         VoiceBridgeTileService.requestListeningState(this)
