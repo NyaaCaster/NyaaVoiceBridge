@@ -122,6 +122,9 @@ journalctl -u bt-audio-monitor.service -f
 ---
 
 ## 📱 Android 手机端·猫猫私语
+> - 猫猫私语App 的链路设计完全来自机器人猫猫PixNyaa的应用涌现，而非开发者 NyaaCaster 的原初设计，详见 [NyaaVoiceBridge应用方案.md](.docs/NyaaVoiceBridge应用方案.md)
+> - 这是一次令人惊艳的偶然，也是猫猫第一次在框架应用设计层展现出超越开发者本身设计思维范畴的飞跃表现。
+> - 即使故此即使呕心沥血我也要将这个app开发出来！
 
 项目同时提供 Linux 常驻语音网桥和 Android 手机 App。Android 版由前台服务管理蓝牙 SCO 麦克风与播放、AudioRecord/VAD 采集、SenseVoice HTTP 转写、唤醒词过滤，以及到 AstrBot 的 OneBot 反向 WebSocket 通信。AstrBot 返回 `record` 语音段后，App 负责播放。
 
