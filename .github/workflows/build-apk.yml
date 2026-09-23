@@ -20,19 +20,16 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
-
-    - name: Grant execute permission for gradlew
+    - name: Ensure gradlew exists
       working-directory: android
       run: |
-        if [ ! -f "gradlew" ]; then
-          gradle wrapper --gradle-version 8.2
-        fi
+        gradle wrapper --gradle-version 8.2
         chmod +x gradlew
 
     - name: Build Debug APK
       working-directory: android
+      env:
+        ANDROID_HOME: /usr/local/lib/android/sdk
       run: ./gradlew assembleDebug --stacktrace
 
     - name: Upload Debug APK Artifact
