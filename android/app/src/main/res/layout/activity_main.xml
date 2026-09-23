@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0C0D10"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <!-- 顶部状态栏与主控制按键 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#14171E"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="monospace"
+            android:text="🐱 NyaaVoiceBridge [TUI]"
+            android:textColor="#00FF66"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_status_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:background="#202530"
+            android:fontFamily="monospace"
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="2dp"
+            android:text="🔴 STOPPED"
+            android:textColor="#FF3366"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_toggle_service"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:backgroundTint="#00FF66"
+            android:fontFamily="monospace"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="START"
+            android:textColor="#000000"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- 可折叠配置参数面板 -->
+    <LinearLayout
+        android:id="@+id/panel_config"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:background="#14171E"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="monospace"
+                android:text="⚙️ CONNECTION &amp; AGENT CONFIG"
+                android:textColor="#8892B0"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btn_save_config"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:backgroundTint="#00E5FF"
+                android:fontFamily="monospace"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="SAVE"
+                android:textColor="#000000"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- AstrBot WS URL -->
+        <EditText
+            android:id="@+id/et_astrbot_ws"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#0C0D10"
+            android:fontFamily="monospace"
+            android:hint="AstrBot WS (e.g. ws://h.nyaa.host:6185/ws)"
+            android:padding="6dp"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#444D66"
+            android:textSize="12sp" />
+
+        <!-- STT API URL -->
+        <EditText
+            android:id="@+id/et_stt_api"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="#0C0D10"
+            android:fontFamily="monospace"
+            android:hint="STT API (e.g. http://127.0.0.1:5052/...)"
+            android:padding="6dp"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#444D66"
+            android:textSize="12sp" />
+
+        <!-- User ID & Wake Word -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/et_user_id"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="#0C0D10"
+                android:fontFamily="monospace"
+                android:hint="User ID (e.g. 10001)"
+                android:inputType="number"
+                android:padding="6dp"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#444D66"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/et_wake_word"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_weight="1"
+                android:background="#0C0D10"
+                android:fontFamily="monospace"
+                android:hint="Wake (e.g. 小猫同学)"
+                android:padding="6dp"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#444D66"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- TUI 控制台工具栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="monospace"
+            android:text="TERMINAL REALTIME STREAM"
+            android:textColor="#8892B0"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_clear_log"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:backgroundTint="#202530"
+            android:fontFamily="monospace"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="CLEAR"
+            android:textColor="#8892B0"
+            android:textSize="10sp" />
+    </LinearLayout>
+
+    <!-- 极客黑客暗黑终端 TUI Log 视图 -->
+    <ScrollView
+        android:id="@+id/scroll_terminal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="4dp"
+        android:layout_weight="1"
+        android:background="#050608"
+        android:fillViewport="true"
+        android:padding="6dp">
+
+        <TextView
+            android:id="@+id/tv_terminal_output"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:lineSpacingExtra="2dp"
+            android:text="[00:00:00.000] [INFO] NyaaVoiceBridge TUI Initialized.\n"
+            android:textColor="#00FF66"
+            android:textSize="11sp" />
+    </ScrollView>
+
+</LinearLayout>
