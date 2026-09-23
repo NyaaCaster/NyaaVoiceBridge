@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * 原生 AudioRecord 硬件录音驱动管道
  */
 class AudioRecordDriver(
-    private val sampleRate: Int = 48000,
+    private val sampleRate: Int = 16000,
     private val channels: Int = 1,
     private val vadEngine: RmsVadEngine,
     private val onSpeechSegmentReady: (ByteArray) -> Unit

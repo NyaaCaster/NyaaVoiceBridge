@@ -125,9 +125,10 @@ class VoiceBridgeService : Service() {
         scoManager?.startSco()
 
         try {
-            val vadEngine = com.nyaa.voicebridge.audio.RmsVadEngine()
+            val sampleRate = 16000
+            val vadEngine = com.nyaa.voicebridge.audio.RmsVadEngine(sampleRate = sampleRate)
             audioRecordDriver = AudioRecordDriver(
-                sampleRate = 48000,
+                sampleRate = sampleRate,
                 channels = 1,
                 vadEngine = vadEngine,
                 onSpeechSegmentReady = { wavBytes ->

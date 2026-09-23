@@ -8,12 +8,12 @@ import kotlin.math.sqrt
  * 轻量低功耗 RMS 能量计算与滑动静音切片引擎 (基于 PCM 16bit 48kHz)
  */
 class RmsVadEngine(
-    private val sampleRate: Int = 48000,
+    private val sampleRate: Int = 16000,
     private val channels: Int = 1,
-    private val energyThreshold: Double = 0.015,
-    private val silenceDurationSec: Double = 0.8,
-    private val preSpeechDurationSec: Double = 0.6,
-    private val minSpeechDurationSec: Double = 0.5,
+    private val energyThreshold: Double = 0.02,
+    private val silenceDurationSec: Double = 0.7,
+    private val preSpeechDurationSec: Double = 0.5,
+    private val minSpeechDurationSec: Double = 0.8,
     private val maxSpeechDurationSec: Double = 15.0
 ) {
     private var isSpeaking = false
