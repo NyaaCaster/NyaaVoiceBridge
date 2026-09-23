@@ -3,9 +3,20 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
+fun String.asBuildConfigString(): String =
+    "\"" + replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+
+val deploymentAstrbotWsUrl = providers.gradleProperty("nyaa.astrbotWsUrl").orNull.orEmpty()
+val deploymentSttApiUrl = providers.gradleProperty("nyaa.sttApiUrl").orNull.orEmpty()
+val deploymentUserId = providers.gradleProperty("nyaa.userId").orNull?.toLongOrNull() ?: 0L
+
 android {
     namespace = "com.nyaa.voicebridge"
     compileSdk = 34
+
+    buildFeatures {
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId = "com.nyaa.voicebridge"
@@ -15,6 +26,10 @@ android {
         versionName = "2.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "DEFAULT_ASTRBOT_WS", deploymentAstrbotWsUrl.asBuildConfigString())
+        buildConfigField("String", "DEFAULT_STT_API", deploymentSttApiUrl.asBuildConfigString())
+        buildConfigField("long", "DEFAULT_USER_ID", "${deploymentUserId}L")
     }
 
     buildTypes {
@@ -40,7 +55,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    
+
     // 网络通信与异步 (OkHttp WebSocket + Coroutines)
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")

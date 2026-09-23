@@ -1,4 +1,4 @@
-# NyaaVoiceBridge 🐱🎙️
+# NyaaVoiceBridge·猫猫语音桥 🐱🎙️
 
 > 「世界の中心で、AIをさけぶ」<br>——连接物理蓝牙音频设备与 AstrBot 机器人的独立低延迟语音桥接服务。
 >- ……这不是小爱同学，是贾维斯……喵维斯？
@@ -121,7 +121,7 @@ journalctl -u bt-audio-monitor.service -f
 
 ---
 
-## 📱 Android 手机端
+## 📱 Android 手机端·猫猫私语
 
 项目同时提供 Linux 常驻语音网桥和 Android 手机 App。Android 版由前台服务管理蓝牙 SCO 麦克风与播放、AudioRecord/VAD 采集、SenseVoice HTTP 转写、唤醒词过滤，以及到 AstrBot 的 OneBot 反向 WebSocket 通信。AstrBot 返回 `record` 语音段后，App 负责播放。
 

@@ -111,7 +111,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun saveConfigFromUi() {
-        val uid = etUserId.text.toString().toLongOrNull() ?: 10001L
+        val uid = etUserId.text.toString().toLongOrNull() ?: ConfigManager.DEFAULT_USER_ID
         val cfg = BridgeConfig(
             astrbotWsUrl = etAstrbotWs.text.toString(),
             sttApiUrl = etSttApi.text.toString(),

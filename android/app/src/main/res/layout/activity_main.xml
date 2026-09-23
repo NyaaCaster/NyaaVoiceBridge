@@ -101,7 +101,7 @@
             android:layout_height="wrap_content"
             android:background="#0C0D10"
             android:fontFamily="monospace"
-            android:hint="AstrBot WS (e.g. ws://h.nyaa.host:6185/ws)"
+            android:hint="AstrBot WS (e.g. ws://astrbot.example.invalid:PORT/ws)"
             android:padding="6dp"
             android:textColor="#FFFFFF"
             android:textColorHint="#444D66"

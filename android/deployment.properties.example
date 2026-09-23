@@ -1,0 +1,4 @@
+# 复制为 deployment.properties 后填写自己的部署值。
+astrbot.ws.url=ws://astrbot.example.invalid:PORT/ws
+stt.api.url=https://stt.example.invalid/v1/audio/transcriptions
+astrbot.user.id=YOUR_ASTRBOT_USER_ID

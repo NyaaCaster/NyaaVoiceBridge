@@ -1,4 +1,7 @@
-# NyaaVoiceBridge Android App
+# NyaaVoiceBridge Android 猫猫私语App
+> - 猫猫私语App 的链路设计完全来自机器人猫猫PixNyaa的应用涌现，而非开发者 NyaaCaster 的原初设计，详见 [NyaaVoiceBridge应用方案.md](../.docs/NyaaVoiceBridge应用方案.md)
+> - 这是一次令人惊艳的偶然，也是猫猫第一次在框架应用设计层展现出超越开发者本身设计思维范畴的飞跃表现。
+> - 即使故此即使呕心沥血我也要将这个app开发出来！
 
 Android 手机端语音桥接应用。它采集蓝牙麦克风音频，在本机外部的 SenseVoice 兼容 HTTP 服务完成语音转写，执行唤醒词过滤，再通过 OneBot 反向 WebSocket 将请求发送给 AstrBot。
 
@@ -38,17 +41,17 @@ App 发出的是普通 OneBot 文本消息，例如：
 | `TtsAudioPlayer.kt` | 播放返回的语音数据或音频 URL |
 | `ConfigManager.kt` | 持久化设置并提供首次安装默认值 |
 
-## 配置默认值
+## 私有部署配置与打包
 
-首次启动时，`ConfigManager.kt` 在没有保存配置的情况下提供以下默认值：
+WebSocket 地址、STT endpoint 和 AstrBot 用户 ID 属于部署私有配置，不要写入受 Git 跟踪的源码或文档。首次打包时，将 `deployment.properties.example` 复制为未跟踪的 `deployment.properties`，填写本机值，然后运行：
 
-- AstrBot WebSocket：`ws://h.nyaa.host:6199/ws`
-- STT endpoint：`http://h.nyaa.host:5052/v1/audio/transcriptions`
-- 唤醒词：`小猫同学`
-- 自动蓝牙 SCO：开启
-- AstrBot 用户 ID：由部署配置中的 `DEFAULT_USER_ID` 指定
+```powershell
+.\package-apk.ps1
+```
 
-配置保存在 `nyaa_bridge_prefs` SharedPreferences 中。启动语音服务时，界面上的配置会保存；为其他部署构建时，请按需修改 `ConfigManager.kt` 中的默认值。
+脚本读取本地配置，并通过 Gradle 构建参数注入 APK 默认值。`deployment.properties` 已列入 `.gitignore`；提交前请确认未将其强制加入 Git。提交仓库中的示例只包含占位符。
+
+配置保存在 `nyaa_bridge_prefs` SharedPreferences 中。首次启动默认值来自 APK 构建时注入的部署参数；唤醒词默认值为 `小猫同学`，自动蓝牙 SCO 默认开启。
 
 ## 构建环境
 
@@ -56,20 +59,13 @@ App 发出的是普通 OneBot 文本消息，例如：
 - JDK 17、Gradle 8.2、Android SDK Platform 34。
 - 需要麦克风录音、蓝牙连接等系统权限；Android 12 及以上还需要附近设备权限以使用 SCO 路由。
 - 手机需要能访问所配置的 STT 服务和 AstrBot WebSocket。
-
-项目提供 Gradle 构建配置，但没有提交 Gradle Wrapper 脚本。设置好 JDK、Android SDK 和 Gradle 8.2 后，在本目录执行：
-
-```powershell
-gradle :app:assembleDebug --no-daemon
-```
+- 当前开发机工具链放在 `H:\GitHub\AndroidKitTools`；可直接使用上面的打包脚本。
 
 APK 输出位置：
 
 ```text
 app/build/outputs/apk/debug/app-debug.apk
 ```
-
-当前开发机所用工具链放在 `H:\GitHub\AndroidKitTools`。
 
 ## 安装与更新
 

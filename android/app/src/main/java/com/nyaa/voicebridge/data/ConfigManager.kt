@@ -2,6 +2,7 @@ package com.nyaa.voicebridge.data
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.nyaa.voicebridge.BuildConfig
 
 data class BridgeConfig(
     val astrbotWsUrl: String,
@@ -22,10 +23,10 @@ class ConfigManager(context: Context) {
         private const val KEY_WAKE_WORD = "key_wake_word"
         private const val KEY_AUTO_SCO = "key_auto_sco"
 
-        // 安全默认脱敏值 (对齐 SSOT 规范)
-        const val DEFAULT_ASTRBOT_WS = "ws://h.nyaa.host:6199/ws"
-        const val DEFAULT_STT_API = "http://h.nyaa.host:5052/v1/audio/transcriptions"
-        const val DEFAULT_USER_ID = 1369356335L
+        // 默认值由本地部署配置在打包时注入
+        const val DEFAULT_ASTRBOT_WS = BuildConfig.DEFAULT_ASTRBOT_WS
+        const val DEFAULT_STT_API = BuildConfig.DEFAULT_STT_API
+        const val DEFAULT_USER_ID = BuildConfig.DEFAULT_USER_ID
         const val DEFAULT_WAKE_WORD = "小猫同学"
         const val DEFAULT_AUTO_BLUETOOTH_SCO = true
     }
