@@ -30,7 +30,12 @@ jobs:
       working-directory: android
       env:
         ANDROID_HOME: /usr/local/lib/android/sdk
-      run: ./gradlew assembleDebug --stacktrace
+      run: |
+        ./gradlew assembleDebug --no-daemon --info > build.log 2>&1 || {
+          echo "=== GRADLE BUILD FAILED ==="
+          tail -n 80 build.log
+          exit 1
+        }
 
     - name: Upload Debug APK Artifact
       uses: actions/upload-artifact@v4
