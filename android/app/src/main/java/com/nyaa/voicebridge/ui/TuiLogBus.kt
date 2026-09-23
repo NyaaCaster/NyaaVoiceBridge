@@ -51,6 +51,13 @@ object TuiLogBus {
     }
 
     @Synchronized
+    fun getAllLogText(): String {
+        return history.joinToString(separator = "\n") { entry ->
+            "[${entry.timestamp}] [${entry.level.name}] ${entry.message}"
+        }
+    }
+
+    @Synchronized
     fun clear() {
         history.clear()
         val entry = LogEntry(timeFormat.format(Date()), LogLevel.INFO, "--- TUI 控制台日志已清空 ---")

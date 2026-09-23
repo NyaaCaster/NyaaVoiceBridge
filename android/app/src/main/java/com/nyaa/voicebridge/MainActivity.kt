@@ -1,6 +1,9 @@
 package com.nyaa.voicebridge
 
 import android.Manifest
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -31,6 +34,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnToggleService: Button
     private lateinit var btnSaveConfig: Button
     private lateinit var btnClearLog: Button
+    private lateinit var btnCopyLog: Button
 
     private lateinit var etAstrbotWs: EditText
     private lateinit var etSttApi: EditText
@@ -64,6 +68,7 @@ class MainActivity : AppCompatActivity() {
         btnToggleService = findViewById(R.id.btn_toggle_service)
         btnSaveConfig = findViewById(R.id.btn_save_config)
         btnClearLog = findViewById(R.id.btn_clear_log)
+        btnCopyLog = findViewById(R.id.btn_copy_log)
 
         etAstrbotWs = findViewById(R.id.et_astrbot_ws)
         etSttApi = findViewById(R.id.et_stt_api)
@@ -84,6 +89,14 @@ class MainActivity : AppCompatActivity() {
         btnClearLog.setOnClickListener {
             tvTerminalOutput.text = ""
             TuiLogBus.clear()
+        }
+
+        btnCopyLog.setOnClickListener {
+            val allLogs = TuiLogBus.getAllLogText()
+            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText("NyaaVoiceBridge Logs", allLogs)
+            clipboard.setPrimaryClip(clip)
+            Toast.makeText(this, "日志已复制到剪贴板 (${allLogs.lines().size} 行)", Toast.LENGTH_SHORT).show()
         }
 
         updateServiceUiState()
