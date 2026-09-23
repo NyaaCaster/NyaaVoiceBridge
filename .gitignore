@@ -40,3 +40,6 @@ logs/
 .vscode/
 *.swp
 *.swo
+
+# Local Android build artifacts
+/release-apk/
