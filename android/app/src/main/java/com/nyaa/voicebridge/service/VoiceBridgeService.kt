@@ -109,9 +109,15 @@ class VoiceBridgeService : Service() {
         scoManager = BluetoothScoManager(this)
         scoManager?.startSco()
 
-        audioRecordDriver = AudioRecordDriver { wavBytes ->
-            onSpeechCaptured(wavBytes)
-        }.also { it.startRecording() }
+        val vadEngine = com.nyaa.voicebridge.audio.RmsVadEngine()
+        audioRecordDriver = AudioRecordDriver(
+            sampleRate = 48000,
+            channels = 1,
+            vadEngine = vadEngine,
+            onSpeechSegmentReady = { wavBytes ->
+                onSpeechCaptured(wavBytes)
+            }
+        ).also { it.startRecording() }
 
         // 同步通知系统下拉快捷开关磁贴刷新状态
         VoiceBridgeTileService.requestListeningState(this)

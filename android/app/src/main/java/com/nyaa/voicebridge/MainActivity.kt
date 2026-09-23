@@ -113,7 +113,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun toggleServiceState() {
         val intent = Intent(this, VoiceBridgeService::class.java)
-        if (VoiceBridgeService.isRunning) {
+        if (VoiceBridgeService.isServiceRunning) {
             intent.action = VoiceBridgeService.ACTION_STOP
             startService(intent)
         } else {
@@ -130,7 +130,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateServiceUiState() {
-        if (VoiceBridgeService.isRunning) {
+        if (VoiceBridgeService.isServiceRunning) {
             tvStatusBadge.text = "🟢 LISTENING"
             tvStatusBadge.setTextColor(Color.parseColor("#00FF66"))
             btnToggleService.text = "STOP"
