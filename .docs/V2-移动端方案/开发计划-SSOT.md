@@ -24,7 +24,7 @@
    - 音频采集：单声道 16bit PCM（默认 48kHz，自适应 SenseVoice 最佳识别率）。
    - 硬件与软件双重互斥：收到 TTS 播放时立即暂停 VAD 采集，播放结束延迟 500ms 重启监听，彻底杜绝自发自收。
 4. **网络拓扑规范**：
-   - 复用既有的 macmini Nginx 反代网络（AstrBot 公网地址：`http://h.nyaa.host:6185` / `ws://h.nyaa.host:6185/ws`）。
+   - 复用既有的 macmini Nginx 反代网络（AstrBot 控制面板：`http://h.nyaa.host:6185`，OneBot11 反向 WS 地址：`ws://h.nyaa.host:6199/ws`）。
    - 若移动端 Android WebView / OkHttp 对加密通道有严格要求，统一配置 Nginx WSS / HTTPS 代理证书。
 
 ---
