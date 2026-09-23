@@ -77,49 +77,89 @@ class AstrBotClient(
             val echo = json.optString("echo", "")
             val action = json.optString("action", "")
 
-            if (echo.isNotEmpty() && action.isNotEmpty()) {
+            // AstrBot sends OneBot reverse-WS API calls (e.g. send_private_msg).
+            // Execute each request and return its result using the same echo.
+            if (action.isNotEmpty() && json.has("params")) {
+                val params = json.optJSONObject("params")
+                val result = if (params != null) executeIncomingAction(action, params) else null
                 val ack = JSONObject().apply {
-                    put("status", "ok")
-                    put("retcode", 0)
-                    put("data", JSONObject())
-                    put("echo", echo)
+                    put("status", if (result != null) "ok" else "failed")
+                    put("retcode", if (result != null) 0 else 1)
+                    put("data", result ?: JSONObject())
+                    if (echo.isNotEmpty()) put("echo", echo)
                 }
                 webSocket?.send(ack.toString())
+                return
             }
 
-            if (action == "send_msg" || action == "send_private_msg") {
-                val params = json.optJSONObject("params")
-                if (params != null) {
-                    parseAndDispatchMessage(params)
-                }
-            }
+            // Ignore responses to actions initiated by this client; they are not commands.
+            if (echo.isNotEmpty() && (json.has("status") || json.has("retcode"))) return
+
+            TuiLogBus.warn("AstrBot", "忽略未处理的下行 WS 数据: ${text.take(240)}")
         } catch (e: Exception) {
             TuiLogBus.error("AstrBot", "解析下行消息失败: ${e.message}")
         }
     }
 
-    private fun parseAndDispatchMessage(params: JSONObject) {
-        val message = params.opt("message")
+    private fun executeIncomingAction(action: String, params: JSONObject): JSONObject? {
+        return when (action) {
+            "send_msg", "send_private_msg" -> {
+                val user = params.optLong("user_id", userId)
+                if (user != userId) {
+                    TuiLogBus.warn("AstrBot", "忽略发往其他用户的私聊: user_id=$user")
+                    return JSONObject().put("message_id", -1)
+                }
+                val message = params.opt("message")
+                val voice = extractRecordFile(message)
+                if (voice != null) {
+                    TuiLogBus.info("AstrBot", "收到 AstrBot 语音回复: ${voice.take(100)}")
+                    onVoiceMessageReceived(voice)
+                } else {
+                    val textReply = extractTextMessage(message)
+                    if (textReply.isNotBlank()) {
+                        TuiLogBus.warn("AstrBot", "收到文本回复但无 record 语音段，无法播放: ${textReply.take(180)}")
+                    } else {
+                        TuiLogBus.warn("AstrBot", "收到无可播放语音段的回复消息")
+                    }
+                }
+                JSONObject().put("message_id", System.currentTimeMillis() % 1_000_000)
+            }
+            "get_msg" -> JSONObject().put("message_id", params.optLong("message_id", -1))
+            else -> {
+                TuiLogBus.warn("AstrBot", "不支持的下行 OneBot action: $action")
+                null
+            }
+        }
+    }
+
+    private fun extractRecordFile(message: Any?): String? {
         if (message is JSONArray) {
             for (i in 0 until message.length()) {
-                val seg = message.getJSONObject(i)
-                if (seg.optString("type") == "record") {
-                    val data = seg.optJSONObject("data")
-                    val file = data?.optString("file", "") ?: ""
-                    if (file.isNotEmpty()) {
-                        onVoiceMessageReceived(file)
-                        return
-                    }
+                val segment = message.optJSONObject(i) ?: continue
+                if (segment.optString("type") == "record") {
+                    val file = segment.optJSONObject("data")?.optString("file")?.takeIf { it.isNotBlank() }
+                    if (file != null) return file
                 }
             }
         } else if (message is String) {
-            val recordRegex = """\[CQ:record,file=([^,\]]+)\]""".toRegex()
-            val match = recordRegex.find(message)
-            if (match != null) {
-                val file = match.groupValues[1]
-                onVoiceMessageReceived(file)
-            }
+            val match = """\[CQ:record,file=([^,\]]+)\]""".toRegex().find(message)
+            if (match != null) return match.groupValues[1]
         }
+        return null
+    }
+
+    private fun extractTextMessage(message: Any?): String {
+        if (message is JSONArray) {
+            return (0 until message.length()).mapNotNull { index ->
+                val segment = message.optJSONObject(index) ?: return@mapNotNull null
+                when (segment.optString("type")) {
+                    "text" -> segment.optJSONObject("data")?.optString("text")
+                    "plain" -> segment.optJSONObject("data")?.optString("text")
+                    else -> null
+                }
+            }.joinToString("")
+        }
+        return message as? String ?: ""
     }
 
     fun sendVoiceText(cleanText: String) {
@@ -128,28 +168,33 @@ class AstrBotClient(
             return
         }
 
-        val silentWavBase64 = "base64://UklGRigAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="
-        val cqMessage = "$cleanText [CQ:record,file=$silentWavBase64]"
-
-        val msgId = (System.currentTimeMillis() % 1000000).toInt()
+        val messageId = (System.currentTimeMillis() % 1000000).toInt()
+        val messageSegments = JSONArray().put(
+            JSONObject().put("type", "text").put("data", JSONObject().put("text", cleanText))
+        )
         val payload = JSONObject().apply {
             put("time", System.currentTimeMillis() / 1000)
             put("self_id", botId)
             put("post_type", "message")
             put("message_type", "private")
             put("sub_type", "friend")
-            put("message_id", msgId)
+            put("message_id", messageId)
             put("user_id", userId)
-            put("message", cqMessage)
-            put("raw_message", cqMessage)
+            put("message", messageSegments)
+            put("raw_message", cleanText)
             put("font", 0)
             put("sender", JSONObject().apply {
                 put("user_id", userId)
                 put("nickname", "NyaaMaster")
+                put("card", "")
+                put("role", "owner")
             })
         }
 
-        webSocket?.send(payload.toString())
+        if (!webSocket!!.send(payload.toString())) {
+            TuiLogBus.error("AstrBot", "发送消息失败，WebSocket 未接受数据")
+            return
+        }
         TuiLogBus.info("AstrBot", "📤 已推送到 AstrBot -> PixNyaa: \"$cleanText\"")
     }
 

@@ -155,8 +155,13 @@ class VoiceBridgeService : Service() {
             TuiLogBus.info("STT", "SenseVoice 转写: \"$rawText\"")
             val cleanCmd = wakeWordDetector?.processText(rawText)
             if (cleanCmd != null) {
+                val command = cleanCmd.trim()
+                if (command.isEmpty()) {
+                    TuiLogBus.warn("WakeWord", "唤醒词命中但指令为空，未发送给 AstrBot")
+                    return@launch
+                }
                 TuiLogBus.success("WakeWord", "🎯 唤醒命中！有效指令: \"$cleanCmd\"")
-                astrBotClient?.sendVoiceText(cleanCmd)
+                astrBotClient?.sendVoiceText("[voice] $command")
             } else {
                 TuiLogBus.warn("WakeWord", "未命中唤醒词或不在会话窗口，已过滤")
             }

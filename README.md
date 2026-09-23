@@ -15,6 +15,7 @@
 - **100% 继承机器人能力**：通过 OneBot V11 反向 WebSocket 协议交互，无损继承 PixNyaa 的全部人格、设定、长短期记忆及第三方插件（如 `Nyaa猫猫语音` 和 `Nyaa猫猫智能框架`）。
 - **纯局域网与零风控**：彻底摆脱 QQ 登录限制、NapCat 风控及公网传输延迟。
 - **超快响应**：基于本地部署的 `SenseVoice-OpenAI-API` 毫秒级语音识别 + 硬件级 PipeWire 录放音流。
+- **Android 手机端**：支持蓝牙耳麦采集、SenseVoice 转写、唤醒词过滤，并通过 OneBot 反向 WebSocket 与 AstrBot 对话；语音转写文本携带 `[voice]` 控制头，由猫猫语音插件触发 TTS 回复。
 - **高可用守护**：采用 Python 异步微核心 + Systemd 守护进程托管，支持开机自启、崩溃自动重启与日志统一轮转。
 
 ---
@@ -46,6 +47,7 @@
 ```tree
 NyaaVoiceBridge/
 ├── .docs/                  # 项目文档、SSOT 蓝图与阶段交接
+├── android/                # Kotlin Android App（移动端语音桥接）
 ├── config/                 # 配置文件模板
 │   └── config.example.yaml
 ├── scripts/                # 蓝牙硬件配置与自愈看门狗
@@ -118,6 +120,14 @@ journalctl -u bt-audio-monitor.service -f
 ```
 
 ---
+
+## 📱 Android 手机端
+
+项目同时提供 Linux 常驻语音网桥和 Android 手机 App。Android 版由前台服务管理蓝牙 SCO 麦克风与播放、AudioRecord/VAD 采集、SenseVoice HTTP 转写、唤醒词过滤，以及到 AstrBot 的 OneBot 反向 WebSocket 通信。AstrBot 返回 `record` 语音段后，App 负责播放。
+
+Android 语音识别结果以普通 OneBot 文本消息发送，并在正文开头带 `[voice]` 控制头。该标签只表示“这是转译后的语音输入”，AstrBot 的 `astrbot_plugin_nyaa_voice` 会在请求进入 LLM 前剥离标签，再注入临时工具调用指令；标签不会混入用户正文。细节见 [Android App 说明](android/README.md) 与 [技术架构文档](.docs/技术架构与拓扑文档.md)。
+
+Android 项目最低支持 API 26，使用 JDK 17、Gradle 8.2 与 Android SDK 34 构建。默认连接参数和唤醒词位于 `android/app/src/main/java/com/nyaa/voicebridge/data/ConfigManager.kt`。
 
 ## 📚 深度架构与技术文档
 想要深入了解整个语音系统底层 PipeWire 交互原理、防吞字 VAD 环形缓冲、OneBot 协议逆向以及 AstrBot 下挂**猫猫全套智能框架（人格、提示词、记忆提炼与外部工具）**的完整运作机制？

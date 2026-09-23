@@ -25,8 +25,9 @@ class ConfigManager(context: Context) {
         // 安全默认脱敏值 (对齐 SSOT 规范)
         const val DEFAULT_ASTRBOT_WS = "ws://h.nyaa.host:6199/ws"
         const val DEFAULT_STT_API = "http://h.nyaa.host:5052/v1/audio/transcriptions"
-        const val DEFAULT_USER_ID = 10001L
+        const val DEFAULT_USER_ID = 1369356335L
         const val DEFAULT_WAKE_WORD = "小猫同学"
+        const val DEFAULT_AUTO_BLUETOOTH_SCO = true
     }
 
     fun loadConfig(): BridgeConfig {
@@ -35,7 +36,7 @@ class ConfigManager(context: Context) {
             sttApiUrl = prefs.getString(KEY_STT_API, DEFAULT_STT_API) ?: DEFAULT_STT_API,
             userId = prefs.getLong(KEY_USER_ID, DEFAULT_USER_ID),
             wakeWord = prefs.getString(KEY_WAKE_WORD, DEFAULT_WAKE_WORD) ?: DEFAULT_WAKE_WORD,
-            isAutoBluetoothSco = prefs.getBoolean(KEY_AUTO_SCO, true)
+            isAutoBluetoothSco = prefs.getBoolean(KEY_AUTO_SCO, DEFAULT_AUTO_BLUETOOTH_SCO)
         )
     }
 
