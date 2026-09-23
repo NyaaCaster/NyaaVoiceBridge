@@ -24,7 +24,7 @@ class ConfigManager(context: Context) {
 
         // 安全默认脱敏值 (对齐 SSOT 规范)
         const val DEFAULT_ASTRBOT_WS = "ws://h.nyaa.host:6199/ws"
-        const val DEFAULT_STT_API = "http://127.0.0.1:5052/v1/audio/transcriptions"
+        const val DEFAULT_STT_API = "http://h.nyaa.host:5052/v1/audio/transcriptions"
         const val DEFAULT_USER_ID = 10001L
         const val DEFAULT_WAKE_WORD = "小猫同学"
     }
