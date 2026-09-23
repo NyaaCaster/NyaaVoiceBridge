@@ -20,6 +20,22 @@ class AudioRecordDriver(
     private var audioRecord: AudioRecord? = null
     private val isRunning = AtomicBoolean(false)
     private var recordingJob: Job? = null
+    private val isMuted = AtomicBoolean(false)
+
+    fun setSpeechMuted(muted: Boolean) {
+        isMuted.set(muted)
+        if (muted) {
+            vadEngine.reset()
+        }
+    }
+
+    fun startRecording(scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())) {
+        start(scope)
+    }
+
+    fun stopRecording() {
+        stop()
+    }
 
     @SuppressLint("MissingPermission")
     fun start(scope: CoroutineScope) {
@@ -53,7 +69,7 @@ class AudioRecordDriver(
                 val chunk = ByteArray(2048) // 约 21ms 的 PCM 块
                 while (isRunning.get() && isActive) {
                     val readBytes = audioRecord?.read(chunk, 0, chunk.size) ?: -1
-                    if (readBytes > 0) {
+                    if (readBytes > 0 && !isMuted.get()) {
                         val validChunk = if (readBytes == chunk.size) chunk else chunk.copyOf(readBytes)
                         val speechPcm = vadEngine.processChunk(validChunk)
                         if (speechPcm != null) {

@@ -29,6 +29,11 @@ class WakeWordDetector(
         this.primaryWakeWord = word
     }
 
+    fun processText(rawText: String): String? {
+        val res = process(rawText)
+        return if (res.isTriggered) res.commandPayload else null
+    }
+
     /**
      * 对 STT 识别出的原始文本进行唤醒判定并提取有效指令
      */

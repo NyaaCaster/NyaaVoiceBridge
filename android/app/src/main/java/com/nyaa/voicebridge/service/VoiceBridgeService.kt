@@ -93,8 +93,8 @@ class VoiceBridgeService : Service() {
 
         val config = configManager.loadConfig()
         astrBotClient = AstrBotClient(
-            wsUrl = config.astrBotWsUrl,
-            botId = config.botId,
+            wsUrl = config.astrbotWsUrl,
+            botId = 943653038L,
             userId = config.userId,
             onVoiceMessageReceived = { audioDataOrUrl ->
                 serviceScope.launch {

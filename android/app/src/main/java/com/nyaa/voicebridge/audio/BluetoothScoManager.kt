@@ -13,8 +13,8 @@ import com.nyaa.voicebridge.ui.TuiLogBus
  */
 class BluetoothScoManager(
     private val context: Context,
-    private val onScoConnected: () -> Unit,
-    private val onScoDisconnected: () -> Unit
+    private val onScoConnected: () -> Unit = {},
+    private val onScoDisconnected: () -> Unit = {}
 ) {
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     private var isReceiverRegistered = false
@@ -61,6 +61,9 @@ class BluetoothScoManager(
             TuiLogBus.logError("SCO", "请求蓝牙 SCO 失败: ${e.message}")
         }
     }
+
+    fun startSco() = start()
+    fun stopSco() = stop()
 
     fun stop() {
         try {

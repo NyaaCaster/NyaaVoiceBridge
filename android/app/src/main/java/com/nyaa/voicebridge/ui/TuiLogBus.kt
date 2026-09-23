@@ -56,4 +56,14 @@ object TuiLogBus {
         val entry = LogEntry(timeFormat.format(Date()), LogLevel.INFO, "--- TUI 控制台日志已清空 ---")
         listeners.forEach { it.invoke(entry) }
     }
+
+    fun info(tag: String, message: String) = log(LogLevel.INFO, "[$tag] $message")
+    fun success(tag: String, message: String) = log(LogLevel.INFO, "[$tag] ✅ $message")
+    fun warn(tag: String, message: String) = log(LogLevel.WARN, "[$tag] ⚠️ $message")
+    fun error(tag: String, message: String) = log(LogLevel.ERROR, "[$tag] ❌ $message")
+
+    fun logInfo(tag: String, message: String) = info(tag, message)
+    fun logSuccess(tag: String, message: String) = success(tag, message)
+    fun logWarn(tag: String, message: String) = warn(tag, message)
+    fun logError(tag: String, message: String) = error(tag, message)
 }
